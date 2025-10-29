@@ -5,30 +5,30 @@ services:
       - ./surreal_data:/mydata
     command: start --log info --user root --pass root rocksdb:/mydata/mydatabase.db
     ports:
-      - "8000:8000"
+      - "8001:8000"
     pull_policy: always
     user: root
     restart: always
 
-  ollama:
-    container_name: ollama
-    image: ollama/ollama:latest
-    ports:
-      - "11434:11434"
-    tty: true
-    restart: unless-stopped
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              device_ids: ["1"]  # GPU1만 사용 (0번이 아니라 두 번째 GPU)
-              capabilities: [gpu]
-    volumes:
-      - ollama_models:/root/.ollama
-    environment:
-      - OLLAMA_KEEP_ALIVE=24h  # 모델이 일정 시간 메모리에 유지되도록
-    pull_policy: always
+  # ollama:
+  #   container_name: ollama
+  #   image: ollama/ollama:latest
+  #   ports:
+  #     - "11434:11434"
+  #   tty: true
+  #   restart: unless-stopped
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             device_ids: ["1"]  # GPU1만 사용 (0번이 아니라 두 번째 GPU)
+  #             capabilities: [gpu]
+  #   volumes:
+  #     - ollama_models:/root/.ollama
+  #   environment:
+  #     - OLLAMA_KEEP_ALIVE=24h  # 모델이 일정 시간 메모리에 유지되도록
+  #   pull_policy: always
 
   open_notebook:
     image: lfnovo/open_notebook:v1-latest
@@ -40,11 +40,11 @@ services:
       - ./.env
     depends_on:
       - surrealdb
-      - ollama
+      # - ollama
     volumes:
       - ./notebook_data:/app/data
     pull_policy: always
     restart: always
 
 volumes:
-  ollama_models:
+  # ollama_models:

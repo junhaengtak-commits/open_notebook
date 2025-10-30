@@ -48,3 +48,5 @@ services:
 
 volumes:
   # ollama_models:
+  surreal_data: {} # <-- 'surreal_data' 볼륨만 정의
+  notebook_data: {} # <-- open_notebook에서 사용하므로 이것도 정의

@@ -30,7 +30,6 @@ from open_notebook.database.async_migrate import AsyncMigrationManager
 
 # Import commands to register them in the API process
 try:
-
     logger.info("Commands imported in API process")
 except Exception as e:
     logger.error(f"Failed to import commands in API process: {e}")
@@ -54,9 +53,13 @@ async def lifespan(app: FastAPI):
             logger.warning("Database migrations are pending. Running migrations...")
             await migration_manager.run_migration_up()
             new_version = await migration_manager.get_current_version()
-            logger.success(f"Migrations completed successfully. Database is now at version {new_version}")
+            logger.success(
+                f"Migrations completed successfully. Database is now at version {new_version}"
+            )
         else:
-            logger.info("Database is already at the latest version. No migrations needed.")
+            logger.info(
+                "Database is already at the latest version. No migrations needed."
+            )
     except Exception as e:
         logger.error(f"CRITICAL: Database migration failed: {str(e)}")
         logger.exception(e)
@@ -81,12 +84,28 @@ app = FastAPI(
 
 # Add password authentication middleware first
 # Exclude /api/auth/status and /api/config from authentication
-app.add_middleware(PasswordAuthMiddleware, excluded_paths=["/", "/health", "/docs", "/openapi.json", "/redoc", "/api/auth/status", "/api/config"])
+app.add_middleware(
+    PasswordAuthMiddleware,
+    excluded_paths=[
+        "/",
+        "/health",
+        "/docs",
+        "/openapi.json",
+        "/redoc",
+        "/api/auth/status",
+        "/api/config",
+    ],
+)
 
 # Add CORS middleware last (so it processes first)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, replace with specific origins
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://192.168.0.95:48005",  # 로컬 프론트엔드
+        "http://developer.aicar-s.com:48005",  # 도메인 프론트엔드
+    ],  # In production, replace with specific origins
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -101,7 +120,9 @@ app.include_router(models.router, prefix="/api", tags=["models"])
 app.include_router(transformations.router, prefix="/api", tags=["transformations"])
 app.include_router(notes.router, prefix="/api", tags=["notes"])
 app.include_router(embedding.router, prefix="/api", tags=["embedding"])
-app.include_router(embedding_rebuild.router, prefix="/api/embeddings", tags=["embeddings"])
+app.include_router(
+    embedding_rebuild.router, prefix="/api/embeddings", tags=["embeddings"]
+)
 app.include_router(settings.router, prefix="/api", tags=["settings"])
 app.include_router(context.router, prefix="/api", tags=["context"])
 app.include_router(sources.router, prefix="/api", tags=["sources"])
